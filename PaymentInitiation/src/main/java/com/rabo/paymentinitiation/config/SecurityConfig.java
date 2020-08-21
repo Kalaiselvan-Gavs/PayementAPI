@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.rabo.paymentinitiation.model.ErrorReasonCode;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -36,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             	return new User(username, "",
                         AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"));
             } else {
-                throw new UsernameNotFoundException("User:" + username + " not found");
+                throw new UsernameNotFoundException(ErrorReasonCode.UNKNOWN_CERTIFICATE.name());
             }
         };
     }
