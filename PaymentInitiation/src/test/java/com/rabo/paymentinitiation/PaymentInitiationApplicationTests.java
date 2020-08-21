@@ -3,6 +3,7 @@ package com.rabo.paymentinitiation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import com.rabo.paymentinitiation.exception.CustomExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +16,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.rabo.paymentinitiation.controller.PaymentInitiationController;
-import com.rabo.paymentinitiation.exception.CustomGlobalExceptionHandler;
 
 //https://thepracticaldeveloper.com/2020/06/04/guide-spring-boot-controller-tests/
 
@@ -36,7 +36,7 @@ class PaymentInitiationApplicationTests {
         //JacksonTester.initFields(this, new ObjectMapper());
         // MockMvc standalone approach
         mvc = MockMvcBuilders.standaloneSetup(paymentInitiationController)
-                .setControllerAdvice(new CustomGlobalExceptionHandler())
+                .setControllerAdvice(new CustomExceptionHandler())
                 //.addFilters(new SuperHeroFilter())
                 .build();
     }
