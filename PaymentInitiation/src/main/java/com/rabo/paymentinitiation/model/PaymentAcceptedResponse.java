@@ -2,7 +2,7 @@ package com.rabo.paymentinitiation.model;
 
 public class PaymentAcceptedResponse {
 	
-    private String paymentId;
+	private String paymentId;
     
     private TransactionStatus status;
     
