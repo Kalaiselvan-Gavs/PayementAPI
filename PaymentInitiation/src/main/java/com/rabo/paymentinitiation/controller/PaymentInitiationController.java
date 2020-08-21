@@ -42,7 +42,7 @@ public class PaymentInitiationController {
 	 */
 	@PostMapping("/initiate-payment")
 	@ApiOperation(value = "Payment initiation API for third party payment providers (TPPs)", produces = "application/json", consumes = "application/json")
-	@ApiResponses(value = { @ApiResponse(code = 201, message = Constants.PAYMENT_ACCEPTED),
+	@ApiResponses(value = {@ApiResponse(code = 201, message = Constants.PAYMENT_ACCEPTED),
 			@ApiResponse(code = 400, message = Constants.PAYMENT_REJECTED),
 			@ApiResponse(code = 422, message = Constants.PAYMENT_REJECTED),
 			@ApiResponse(code = 500, message = Constants.INTERNAL_SERVER), })
