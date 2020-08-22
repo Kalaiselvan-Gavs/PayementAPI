@@ -8,6 +8,7 @@ import javax.validation.ConstraintViolationException;
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentRejectedResponse;
 import com.rabo.paymentinitiation.model.TransactionStatus;
+import com.rabo.paymentinitiation.util.Constants;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,9 +57,9 @@ public class CustomExceptionHandler
 
     private HttpHeaders getRequiredResponseHeaders(WebRequest request){
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Request-Id", request.getHeader("X-Request-Id"));
-        headers.add("Signature-Certificate", request.getHeader("Signature-Certificate"));
-        headers.add("Signature", request.getHeader("Signature"));
+        headers.add(Constants.X_REQUEST_ID, request.getHeader(Constants.X_REQUEST_ID));
+        headers.add(Constants.Signature_Certificate, request.getHeader(Constants.Signature_Certificate));
+        headers.add(Constants.Signature, request.getHeader(Constants.Signature));
         System.out.println(headers.toString());
         return headers;
     }

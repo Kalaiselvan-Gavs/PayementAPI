@@ -46,9 +46,9 @@ public class PaymentInitiationController {
 			@ApiResponse(code = 400, message = Constants.PAYMENT_REJECTED),
 			@ApiResponse(code = 422, message = Constants.PAYMENT_REJECTED),
 			@ApiResponse(code = 500, message = Constants.INTERNAL_SERVER), })
-	public ResponseEntity<Object> processPayment(@RequestHeader(name = "X-Request-Id", required = true) String requestId,
-			@RequestHeader(name = "Signature-Certificate", required = true) String signatureCertificate,
-			@RequestHeader(name = "Signature", required = true) String signature,
+	public ResponseEntity<Object> processPayment(@RequestHeader(name = Constants.X_REQUEST_ID, required = true) String requestId,
+			@RequestHeader(name = Constants.Signature_Certificate, required = true) String signatureCertificate,
+			@RequestHeader(name = Constants.Signature, required = true) String signature,
 			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) throws Exception {
 		
 		log.info("Enter PaymentInitiationController :: processPayment");

@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public UserDetailsService userDetailsService() {
     	
     	return (UserDetailsService) username -> {
-            if (username.startsWith("Sandbox-TPP")) {
+            if (null != username && username.startsWith("Sandbox-TPP")) {
             	return new User(username, "",
                         AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"));
             } else {
