@@ -46,24 +46,22 @@ public class PaymentInitiationController {
 			@ApiResponse(code = 400, message = Constants.PAYMENT_REJECTED),
 			@ApiResponse(code = 422, message = Constants.PAYMENT_REJECTED),
 			@ApiResponse(code = 500, message = Constants.INTERNAL_SERVER), })
-	public ResponseEntity<Object> processPayment(@RequestHeader(name = "X-Request-Id", required = true) String reuestId,
+	public ResponseEntity<Object> processPayment(@RequestHeader(name = "X-Request-Id", required = true) String requestId,
 			@RequestHeader(name = "Signature-Certificate", required = true) String signatureCertificate,
 			@RequestHeader(name = "Signature", required = true) String signature,
-			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) {
+			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) throws Exception {
 		
 		log.info("Enter PaymentInitiationController :: processPayment");
 		
 		//Amount limit exceeded
 		if(paymentService.sumOfDigits(paymentInitiationRequest.getDebtorIBAN()) % paymentInitiationRequest.getDebtorIBAN().length() == 0) {
-			ErrorResponse error = new ErrorResponse(ErrorReasonCode.LIMIT_EXCEEDED.name());
-			return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new Exception(ErrorReasonCode.LIMIT_EXCEEDED.name());
 		}
 		
 		//Signature validation
 		try {
-			if(!paymentService.verifySignature(reuestId, paymentInitiationRequest.toString())) {
-				ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_SIGNATURE.name());
-				return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+			if(!paymentService.verifySignature(requestId, paymentInitiationRequest.toString())) {
+				throw new Exception(ErrorReasonCode.INVALID_SIGNATURE.name());
 			}
 		} catch (InvalidKeyException e) {
 			log.error("Signature verification : InvalidKeyException ", e);
