@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/payment/"+Constants.API_VERSION)
+@RequestMapping("/payment/" + Constants.API_VERSION)
 public class PaymentInitiationController {
 
 	private final Logger log = LoggerFactory.getLogger(PaymentInitiationController.class);
