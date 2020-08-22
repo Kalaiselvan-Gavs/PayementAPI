@@ -11,6 +11,7 @@ import com.rabo.paymentinitiation.model.TransactionStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,7 +43,7 @@ public class CustomExceptionHandler
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({Exception.class, UsernameNotFoundException.class})
     public final ResponseEntity<Object> handleException(Exception exception, WebRequest request)
     {
         PaymentRejectedResponse paymentRejectedResponse = new PaymentRejectedResponse();
