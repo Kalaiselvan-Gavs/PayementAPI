@@ -45,8 +45,6 @@ public class CustomExceptionHandler
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<Object> handleException(Exception exception, WebRequest request)
     {
-        List<String> details = new ArrayList<>();
-        details.add(exception.getLocalizedMessage());
         PaymentRejectedResponse paymentRejectedResponse = new PaymentRejectedResponse();
         paymentRejectedResponse.setReason(exception.getLocalizedMessage());
         paymentRejectedResponse.setStatus(TransactionStatus.REJECTED);
