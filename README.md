@@ -12,8 +12,13 @@ Check the input signature validation.
 Steps to run the application:
 
 Import the project in Eclipse/STS [Maven Project]
+
 Perform maven build - clean package.
+
 Run the PaymentInitiationApplication.java file.
+
 Hit the http://localhost:8443/swagger-ui.html URL in browser.
+
 Expand the Payment-Initation-Controller operation and input the valid payment details.
+
 Click on execute.
