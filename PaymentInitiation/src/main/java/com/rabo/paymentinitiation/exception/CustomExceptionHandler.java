@@ -26,7 +26,7 @@ public class CustomExceptionHandler
     {
         List<String> details = new ArrayList<>();
         details.add(exception.getLocalizedMessage());
-        ErrorResponse error = new ErrorResponse("Bad Request", details);
+        ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_REQUEST.name(), details);
 
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
@@ -40,11 +40,11 @@ public class CustomExceptionHandler
                                     .map(e -> e.getMessage())
                                     .collect(Collectors.toList());
  
-        ErrorResponse error = new ErrorResponse("Bad Request", details);
+        ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_REQUEST.name(), details);
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({Exception.class, UsernameNotFoundException.class})
+    @ExceptionHandler({RuntimeException.class, UsernameNotFoundException.class})
     public final ResponseEntity<Object> handleException(Exception exception, WebRequest request)
     {
         PaymentRejectedResponse paymentRejectedResponse = new PaymentRejectedResponse();
@@ -60,7 +60,6 @@ public class CustomExceptionHandler
         headers.add(Constants.X_REQUEST_ID, request.getHeader(Constants.X_REQUEST_ID));
         headers.add(Constants.Signature_Certificate, request.getHeader(Constants.Signature_Certificate));
         headers.add(Constants.Signature, request.getHeader(Constants.Signature));
-        System.out.println(headers.toString());
         return headers;
     }
 }

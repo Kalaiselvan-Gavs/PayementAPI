@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.rabo.paymentinitiation.exception.ErrorResponse;
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentAcceptedResponse;
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
@@ -49,19 +49,19 @@ public class PaymentInitiationController {
 	public ResponseEntity<Object> processPayment(@RequestHeader(name = Constants.X_REQUEST_ID, required = true) String requestId,
 			@RequestHeader(name = Constants.Signature_Certificate, required = true) String signatureCertificate,
 			@RequestHeader(name = Constants.Signature, required = true) String signature,
-			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) throws Exception {
+			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) throws RuntimeException {
 		
 		log.info("Enter PaymentInitiationController :: processPayment");
 		
 		//Amount limit exceeded
 		if(paymentService.sumOfDigits(paymentInitiationRequest.getDebtorIBAN()) % paymentInitiationRequest.getDebtorIBAN().length() == 0) {
-			throw new Exception(ErrorReasonCode.LIMIT_EXCEEDED.name());
+			throw new RuntimeException(ErrorReasonCode.LIMIT_EXCEEDED.name());
 		}
 		
 		//Signature validation
 		try {
 			if(!paymentService.verifySignature(requestId, paymentInitiationRequest.toString())) {
-				throw new Exception(ErrorReasonCode.INVALID_SIGNATURE.name());
+				throw new RuntimeException(ErrorReasonCode.INVALID_SIGNATURE.name());
 			}
 		} catch (InvalidKeyException e) {
 			log.error("Signature verification : InvalidKeyException ", e);
@@ -75,7 +75,12 @@ public class PaymentInitiationController {
 		paymentAcceptedResponse.setPaymentId(UUID.randomUUID().toString());
 		paymentAcceptedResponse.setStatus(TransactionStatus.ACCEPTED);
 		
-		return new ResponseEntity<>(paymentAcceptedResponse, HttpStatus.CREATED);
+		HttpHeaders headers = new HttpHeaders();
+        headers.add(Constants.X_REQUEST_ID, requestId);
+        headers.add(Constants.Signature_Certificate, signatureCertificate);
+        headers.add(Constants.Signature, signature);
+        
+		return new ResponseEntity<>(paymentAcceptedResponse, headers, HttpStatus.CREATED);
 	}
 
 }
