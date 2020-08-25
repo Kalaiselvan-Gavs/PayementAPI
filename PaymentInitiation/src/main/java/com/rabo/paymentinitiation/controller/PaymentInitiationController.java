@@ -49,7 +49,7 @@ public class PaymentInitiationController {
 	public ResponseEntity<Object> processPayment(@RequestHeader(name = Constants.X_REQUEST_ID, required = true) String requestId,
 			@RequestHeader(name = Constants.Signature_Certificate, required = true) String signatureCertificate,
 			@RequestHeader(name = Constants.Signature, required = true) String signature,
-			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) throws RuntimeException {
+			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) {
 		
 		log.info("Enter PaymentInitiationController :: processPayment");
 		
