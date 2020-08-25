@@ -54,7 +54,7 @@ public class PaymentInitiationController {
 		log.info("Enter PaymentInitiationController :: processPayment");
 		
 		//Amount limit exceeded
-		if(paymentService.sumOfDigits(paymentInitiationRequest.getDebtorIBAN()) % paymentInitiationRequest.getDebtorIBAN().length() == 0) {
+		if(paymentService.checkForAmoutLimitExceeded(paymentInitiationRequest)) {
 			throw new RuntimeException(ErrorReasonCode.LIMIT_EXCEEDED.name());
 		}
 		

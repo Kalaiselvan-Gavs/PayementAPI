@@ -1,7 +1,7 @@
 package com.rabo.paymentinitiation.service;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
+import com.rabo.paymentinitiation.util.PaymentUtil;
 import org.springframework.stereotype.Service;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -16,17 +16,17 @@ import java.security.SignatureException;
 public class PaymentServiceImpl implements PaymentService {
 
 	/**
-	 * Sum all the digits & omitted letters. 
+	 * Amount limit exceeded check
+	 * @param paymentInitiationRequest
+	 * @return
 	 */
-	public int sumOfDigits(String input) {
-		
-		Pattern pattern = Pattern.compile("[\\d]");
-	    Matcher matcher = pattern.matcher(input);
-	    int sum = 0;
-	    while(matcher.find()) {
-	        sum += Integer.parseInt(matcher.group());
-	    }
-	    return sum;
+	@Override
+	public boolean checkForAmoutLimitExceeded(PaymentInitiationRequest paymentInitiationRequest) {
+		if(Double.parseDouble(paymentInitiationRequest.getAmount()) > 0
+				&& (PaymentUtil.sumOfDigits(paymentInitiationRequest.getDebtorIBAN()) % paymentInitiationRequest.getDebtorIBAN().length() == 0)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
