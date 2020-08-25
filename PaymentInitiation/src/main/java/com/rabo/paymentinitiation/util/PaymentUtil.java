@@ -4,6 +4,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PaymentUtil {
+	
+	private PaymentUtil() {
+		
+	}
 
     /**
      * Sum all the digits & omitted letters.

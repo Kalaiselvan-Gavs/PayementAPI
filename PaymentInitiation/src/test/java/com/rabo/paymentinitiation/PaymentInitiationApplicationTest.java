@@ -23,12 +23,11 @@ class PaymentInitiationApplicationTest {
      */
     @Test
     public void contextLoads() {
-    	
+    	assertThat(paymentInitiationController).isNotNull();
     }
 
     @Test
     public void applicationStarts() throws Exception {
     	PaymentInitiationApplication.main(new String[] {});
-    	assertThat(paymentInitiationController).isNotNull();
     }
 }

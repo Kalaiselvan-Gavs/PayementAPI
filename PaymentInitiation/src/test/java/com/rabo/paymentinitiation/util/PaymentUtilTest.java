@@ -1,11 +1,8 @@
 package com.rabo.paymentinitiation.util;
 
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-
-import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
 
 public class PaymentUtilTest {
 	@Test
