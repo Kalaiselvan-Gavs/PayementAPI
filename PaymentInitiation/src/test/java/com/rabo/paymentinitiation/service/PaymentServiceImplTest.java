@@ -22,19 +22,5 @@ class PaymentServiceImplTest {
     void tearDown() {
     }
 
-    @Test
-    void whenCorrectsumOfDigits() {
-        int sum = 43;
-        when(paymentService.sumOfDigits("NL02RABO7134384551")).thenReturn(sum);
-        int realSum = paymentService.sumOfDigits("NL02RABO7134384551");
-        assertEquals(43, realSum);
-    }
 
-    @Test
-    void whenInCorrectsumOfDigits() {
-        int sum = 42;
-        when(paymentService.sumOfDigits("NL02RABO7134384551")).thenReturn(sum);
-        int realSum = paymentService.sumOfDigits("NL02RABO7134384551");
-        assertEquals(sum, realSum);
-    }
 }
