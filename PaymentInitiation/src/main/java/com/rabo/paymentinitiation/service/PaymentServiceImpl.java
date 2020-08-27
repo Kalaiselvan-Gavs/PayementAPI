@@ -2,15 +2,15 @@ package com.rabo.paymentinitiation.service;
 
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
 import com.rabo.paymentinitiation.util.PaymentUtil;
+import com.rabo.paymentinitiation.util.Utils;
 import org.springframework.stereotype.Service;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.SignatureException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.*;
+import java.util.Arrays;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -32,8 +32,8 @@ public class PaymentServiceImpl implements PaymentService {
 	/**
 	 * Verify the signature
 	 */
-	public boolean verifySignature(String xRequestId, String requestBody) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+	public boolean verifySignature(String xRequestId, String requestBody) throws Exception {
+		/*KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 		keyPairGenerator.initialize(2048); // KeySize
 		KeyPair keyPair = keyPairGenerator.generateKeyPair();
 		 
@@ -49,7 +49,27 @@ public class PaymentServiceImpl implements PaymentService {
 		signature.initVerify(publicKey);
 		signature.update(data);
 		
-		return signature.verify(signedData);
+		return signature.verify(signedData);*/
+		PublicKey publicKey = PaymentUtil.getPublicKey();
+		PrivateKey privateKey = PaymentUtil.getPrivateKey();
+
+		byte[] messageBytes = (xRequestId + requestBody).getBytes();
+
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		byte[] newMessageHash = md.digest(messageBytes);
+
+		//Encryption
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+		byte[] digitalSignatureEncryption = cipher.doFinal(newMessageHash);
+
+		//Decryption
+		cipher.init(Cipher.DECRYPT_MODE, publicKey);
+		byte[] decryptedMessageHash = cipher.doFinal(digitalSignatureEncryption);
+
+		boolean isCorrect = Arrays.equals(decryptedMessageHash, newMessageHash);
+		System.out.println("Signature " + (isCorrect ? "correct" : "incorrect"));
+		return isCorrect;
 	}
 	
 }

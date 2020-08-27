@@ -51,8 +51,8 @@ public class CustomFilter implements Filter {
 			if(!paymentService.verifySignature(xRequestId, requestBody)) {
 				throw new RuntimeException(ErrorReasonCode.INVALID_SIGNATURE.name());
 			}
-		} catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException e) {
-			log.error("Error in Signature verification : ", e);
+		} catch (Exception e) {
+			log.error("Exception in Signature verification : ", e);
 		}
 		
 		log.info("Logging Request Body : {} ", requestBody);
