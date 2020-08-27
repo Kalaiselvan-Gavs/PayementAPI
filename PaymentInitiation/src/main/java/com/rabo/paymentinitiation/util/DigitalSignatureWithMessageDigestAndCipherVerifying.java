@@ -36,7 +36,7 @@ public class DigitalSignatureWithMessageDigestAndCipherVerifying {
         
         System.out.println("My String".startsWith("My"));
         System.out.println("My String".startsWith(""));
-        System.out.println("My String".startsWith(null));
+        
     }
 
 }
