@@ -1,6 +1,8 @@
 package com.rabo.paymentinitiation.config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -8,12 +10,21 @@ import java.security.Principal;
 import java.security.SignatureException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -21,6 +32,8 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.Assert;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabo.paymentinitiation.controller.PaymentInitiationController;
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
@@ -58,8 +71,8 @@ public class SecurityConfigTest {
         //when(paymentService.checkForAmoutLimitExceeded(paymentRequest)).thenReturn(false);
         //when(paymentService.verifySignature(any(String.class),any(String.class))).thenReturn(true);
         
-    }
-
+    }	
+	
 	@Test
 	public void untrustedClientShouldBeForbidden() throws Exception {
 
@@ -83,7 +96,7 @@ public class SecurityConfigTest {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
  				.post("/payment/v1.0.0/initiate-payment")
- 				.with(x509(getCertificateFromFile("classpath:ssl/untrusted-cert.pem")))
+ 				.with(x509(getCertificateFromFile("classpath:ssl/sender_certificate.cer")))
  				.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
  				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
         		.header(Constants.X_REQUEST_ID, "1")
@@ -93,9 +106,26 @@ public class SecurityConfigTest {
 	 	MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 	
 		MockHttpServletResponse response = result.getResponse();
-	
+		//assertEquals(HttpStatus.ACCEPTED.value(), response.getStatus());
 	}
+	
+	@Test
+	public void whenClientCertificateNoAvail() throws Exception {
 
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+ 				.post("/payment/v1.0.0/initiate-payment")
+ 				.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
+ 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+        		.header(Constants.X_REQUEST_ID, "1")
+        		.header(Constants.Signature_Certificate, "2")
+				.header(Constants.Signature, "3");
+     
+	 	MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+	
+		MockHttpServletResponse response = result.getResponse();
+		//assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+	}
+	
 	private RequestPostProcessor x509(Object certificateFromFile) {
 		return new RequestPostProcessor() {
 

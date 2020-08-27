@@ -1,6 +1,10 @@
 package com.rabo.paymentinitiation.util;
 
 import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.security.UnrecoverableKeyException;
+
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
@@ -24,6 +28,20 @@ public class PaymentUtilTest {
 	public void shoudHandleInValidDebtorIBAN_Null() {
 		Assertions.assertThrows(NullPointerException.class, () -> {
 			PaymentUtil.sumOfDigits(null);
+          });
+	}
+	
+	@Test
+	public void shoudHandlePublicKeyIOException() {
+		Assertions.assertThrows(Exception.class, () -> {
+			PaymentUtil.getPublicKey();
+          });
+	}
+	
+	@Test
+	public void shoudHandlePrivateKey() {
+		Assertions.assertThrows(Exception.class, () -> {
+			PaymentUtil.getPrivateKey();
           });
 	}
 }

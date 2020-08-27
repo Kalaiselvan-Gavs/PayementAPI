@@ -2,19 +2,19 @@ package com.rabo.paymentinitiation.service;
 
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
 import com.rabo.paymentinitiation.util.PaymentUtil;
-import com.rabo.paymentinitiation.util.Utils;
-import org.springframework.stereotype.Service;
 
-import javax.crypto.BadPaddingException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.security.*;
 import java.util.Arrays;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+	@Value( "${key.store.password}" )
+	private String keyStorePassword;
+	
 	/**
 	 * Amount limit exceeded check
 	 * @param paymentInitiationRequest
@@ -33,23 +33,8 @@ public class PaymentServiceImpl implements PaymentService {
 	 * Verify the signature
 	 */
 	public boolean verifySignature(String xRequestId, String requestBody) throws Exception {
-		/*KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-		keyPairGenerator.initialize(2048); // KeySize
-		KeyPair keyPair = keyPairGenerator.generateKeyPair();
-		 
-		PrivateKey privateKey = keyPair.getPrivate();
-		PublicKey publicKey = keyPair.getPublic();
-		 
-		byte[] data = (xRequestId + requestBody).getBytes();
-		Signature signature = Signature.getInstance("SHA256withRSA");
-		signature.initSign(privateKey);
-		signature.update(data);
-		byte[] signedData = signature.sign();
-		 
-		signature.initVerify(publicKey);
-		signature.update(data);
 		
-		return signature.verify(signedData);*/
+		PaymentUtil.setKeyStorePassword(keyStorePassword);
 		PublicKey publicKey = PaymentUtil.getPublicKey();
 		PrivateKey privateKey = PaymentUtil.getPrivateKey();
 
@@ -67,9 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
 		cipher.init(Cipher.DECRYPT_MODE, publicKey);
 		byte[] decryptedMessageHash = cipher.doFinal(digitalSignatureEncryption);
 
-		boolean isCorrect = Arrays.equals(decryptedMessageHash, newMessageHash);
-		System.out.println("Signature " + (isCorrect ? "correct" : "incorrect"));
-		return isCorrect;
+		return Arrays.equals(decryptedMessageHash, newMessageHash);
 	}
 	
 }

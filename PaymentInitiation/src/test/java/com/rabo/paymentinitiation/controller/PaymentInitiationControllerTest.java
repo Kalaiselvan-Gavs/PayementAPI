@@ -59,7 +59,6 @@ public class PaymentInitiationControllerTest {
         paymentRequest.setAmount("1.0");
         paymentRequest.setEndToEndId("1");
         when(paymentService.checkForAmoutLimitExceeded(paymentRequest)).thenReturn(false);
-        when(paymentService.verifySignature(any(String.class),any(String.class))).thenReturn(true);
         
     }
 

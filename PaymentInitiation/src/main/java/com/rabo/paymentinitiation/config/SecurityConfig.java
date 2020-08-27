@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -24,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/","/swagger-ui.html").permitAll()
-                .and().x509().subjectPrincipalRegex("CN=(.*?),")
+                .and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
                 .userDetailsService(userDetailsService());
     }
 
@@ -33,11 +34,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public UserDetailsService userDetailsService() {
     	
-    	return (UserDetailsService) username -> {
-            if (null != username && username.startsWith("Sandbox-TPP")) {
-            	return new User(username, "",
-                        AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"));
-            } else {
+    	return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) {
+                if (null != username && username.startsWith("Sandbox-TPP")) {
+                    return new User(username, "", 
+                      AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"));
+                }
                 throw new UsernameNotFoundException(ErrorReasonCode.UNKNOWN_CERTIFICATE.name());
             }
         };

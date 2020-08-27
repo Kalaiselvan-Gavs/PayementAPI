@@ -1,9 +1,6 @@
 package com.rabo.paymentinitiation.filter;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -48,6 +45,7 @@ public class CustomFilter implements Filter {
 		String requestBody = new String(byteArray);
 		
 		try {
+			//Signature validation
 			if(!paymentService.verifySignature(xRequestId, requestBody)) {
 				throw new RuntimeException(ErrorReasonCode.INVALID_SIGNATURE.name());
 			}
@@ -56,13 +54,10 @@ public class CustomFilter implements Filter {
 		}
 		
 		log.info("Logging Request Body : {} ", requestBody);
-		log.info("Logging Request  {} : {}", wrappedRequest.getMethod(), wrappedRequest.getRequestURI());
 		
 		// call next filter in the filter chain
 		filterChain.doFilter(wrappedRequest, response);
-		
-		log.info("Logging Response :{}", response.getContentType());
-		
+
 	}
 	
 	@Override

@@ -38,4 +38,20 @@ public class ErrorResponseTest {
 		String message = errorResponse.getDetails().get(0);
 		assertEquals("ErrorItem", message);
 	}
+	
+	@Test
+	public void whenResponseListCheck() {
+		List<String> list = new ArrayList<>();
+		list.add("ErrorItem");
+		errorResponse = new ErrorResponse("Error",list);
+		assertEquals("Error", errorResponse.getMessage());
+		assertEquals("ErrorItem", errorResponse.getDetails().get(0));
+	}
+	
+	@Test
+	public void whenSetResponseCheck() {
+		errorResponse = new ErrorResponse("Error");	
+		errorResponse.setMessage("ErrorItem");
+		assertEquals("ErrorItem", errorResponse.getMessage());
+	}
 }

@@ -1,8 +1,5 @@
 package com.rabo.paymentinitiation.controller;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -11,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentAcceptedResponse;
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
@@ -34,7 +34,8 @@ public class PaymentInitiationController {
 
 	@Autowired
 	private PaymentService paymentService;
-	 
+	
+	
 	/**
 	 * To Initiate a payment for third party payment providers (TPPs)  
 	 * @param paymentInitiationRequest
@@ -58,18 +59,6 @@ public class PaymentInitiationController {
 			throw new RuntimeException(ErrorReasonCode.LIMIT_EXCEEDED.name());
 		}
 		
-		//Signature validation
-		try {
-			if(!paymentService.verifySignature(requestId, paymentInitiationRequest.toString())) {
-				throw new RuntimeException(ErrorReasonCode.INVALID_SIGNATURE.name());
-			}
-		} catch (InvalidKeyException e) {
-			log.error("Signature verification : InvalidKeyException ", e);
-		} catch (NoSuchAlgorithmException e) {
-			log.error("Signature verification : NoSuchAlgorithmException ", e);
-		} catch (SignatureException e) {
-			log.error("Signature verification : SignatureException ", e);
-		}
 		
 		PaymentAcceptedResponse paymentAcceptedResponse = new PaymentAcceptedResponse();
 		paymentAcceptedResponse.setPaymentId(UUID.randomUUID().toString());

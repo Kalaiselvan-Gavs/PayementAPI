@@ -1,6 +1,8 @@
 package com.rabo.paymentinitiation.service;
 
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
+import com.rabo.paymentinitiation.util.PaymentUtil;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,22 +69,24 @@ class PaymentServiceImplTest {
     }
     
     @Test
-    void whenVerifySignature_OK() throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        boolean isAmountLimitExceeded = paymentService.verifySignature("1234", new String());
-        assertThat(isAmountLimitExceeded);
+    void whenVerifySignature_OK() throws Exception {
+        Assertions.assertThrows(NullPointerException.class, () -> {
+        	paymentService.verifySignature("", null);
+          });
     }
 
     @Test
-    void whenVerifySignature_NotOk() throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    void whenVerifySignature_NotOk() throws Exception {
         paymentRequest = null;
-        boolean isAmountLimitExceeded = paymentService.verifySignature(null, new String());
-        assertThat(isAmountLimitExceeded);
+        Assertions.assertThrows(NullPointerException.class, () -> {
+        	paymentService.verifySignature(null, new String());
+          });
     }
 
     @Test
-    void whenVerifySignature_requestIsNull() throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        paymentRequest = null;
-        boolean isAmountLimitExceeded = paymentService.verifySignature("", null);
-        assertThat(isAmountLimitExceeded);
+    void whenVerifySignature_requestIsNull() throws Exception {
+        Assertions.assertThrows(NullPointerException.class, () -> {
+        	paymentService.verifySignature("", null);
+          });
     }
 }
