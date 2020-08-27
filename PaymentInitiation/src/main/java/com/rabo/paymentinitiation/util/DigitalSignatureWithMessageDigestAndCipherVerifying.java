@@ -34,9 +34,6 @@ public class DigitalSignatureWithMessageDigestAndCipherVerifying {
         boolean isCorrect = Arrays.equals(decryptedMessageHash, newMessageHash);
         System.out.println("Signature " + (isCorrect ? "correct" : "incorrect"));
         
-        System.out.println("My String".startsWith("My"));
-        System.out.println("My String".startsWith(""));
-        
     }
 
 }
