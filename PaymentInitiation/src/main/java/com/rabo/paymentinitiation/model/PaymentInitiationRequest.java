@@ -54,7 +54,7 @@ public class PaymentInitiationRequest {
 
 	@Override
 	public String toString() {
-		return "[debtorIBAN=" + debtorIBAN + ", creditorIBAN=" + creditorIBAN + ", amount="
+		return "PaymentInitiationRequest [debtorIBAN=" + debtorIBAN + ", creditorIBAN=" + creditorIBAN + ", amount="
 				+ amount + ", endToEndId=" + endToEndId + "]";
 	}
 
