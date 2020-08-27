@@ -1,8 +1,6 @@
 package com.rabo.paymentinitiation.service;
 
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
-import com.rabo.paymentinitiation.util.PaymentUtil;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,10 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 

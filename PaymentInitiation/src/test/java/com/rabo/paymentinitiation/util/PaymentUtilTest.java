@@ -2,9 +2,6 @@ package com.rabo.paymentinitiation.util;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-import java.security.UnrecoverableKeyException;
-
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
