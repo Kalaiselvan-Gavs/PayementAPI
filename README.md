@@ -23,7 +23,7 @@ Expand the Payment-Initation-Controller operation and input the valid payment de
 
 Click on execute.
 
-======================================================================================================================
+============================================================================
 
 # Validation Handling
 
@@ -35,8 +35,7 @@ Request validation , GENERAL_ERROR => CustomExceptionHandler.java
 
 Bean Level validations
 
-======================================================================================================================
-
+======================================================================
 
 # New Certificate Creation Steps
 
