@@ -23,7 +23,9 @@ Expand the Payment-Initation-Controller operation and input the valid payment de
 
 Click on execute.
 
-Validation Handling
+======================================================================================================================
+
+# Validation Handling
 
 White listed certificates validation => SecurityConfig.java
 
@@ -33,7 +35,10 @@ Request validation , GENERAL_ERROR => CustomExceptionHandler.java
 
 Bean Level validations
 
-New Certificate Creation Steps
+======================================================================================================================
+
+
+# New Certificate Creation Steps
 
 1. Getting a KeyPair
 
