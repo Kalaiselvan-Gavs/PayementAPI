@@ -4,6 +4,7 @@ import com.rabo.paymentinitiation.exception.GeneralException;
 import com.rabo.paymentinitiation.exception.InvalidException;
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
+import com.rabo.paymentinitiation.util.Constants;
 import com.rabo.paymentinitiation.util.PaymentUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class PaymentServiceImpl implements PaymentService {
 	 * White listed certificates validation
 	 * @param signatureCertificate
 	 */
-	public void whiteListedCertificatesValidation(String signatureCertificate) {
+	public void whiteListedCertificatesValidation(String signatureCertificate)  throws Exception {
 		//Get the Certificate
 		X509Certificate certificate = getX509Certificate(signatureCertificate);
 		
@@ -54,7 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
 	/**
 	 * Verify the signature
 	 */
-	public void verifySignature(String xRequestId, String requestBody, String signatureCertificate, String signature) {
+	public void verifySignature(String xRequestId, String requestBody, String signatureCertificate, String signature)  throws Exception {
 		
 		//Get the Certificate
 		X509Certificate certificate = getX509Certificate(signatureCertificate);
@@ -63,18 +64,18 @@ public class PaymentServiceImpl implements PaymentService {
         try {
         	
         	//Read signature Attribute
-            byte[] encryptedMessageHash = signature.getBytes(StandardCharsets.UTF_8);//Files.readAllBytes(Paths.get("target/digital_signature_2"));
+            byte[] encryptedMessageHash = signature.getBytes(StandardCharsets.UTF_8);
 
-            Signature rsaSignature = Signature.getInstance("SHA256withRSA");//SIGNING_ALGORITHM
+            Signature rsaSignature = Signature.getInstance("SHA256withRSA");
             rsaSignature.initVerify(publicKey);
 
             //Read RequestBody
-            byte[] messageBytes = (xRequestId + requestBody).getBytes(StandardCharsets.UTF_8);//Files.readAllBytes(Paths.get("src/test/resources/digitalsignature/message.txt"));
+            byte[] messageBytes = (xRequestId + requestBody).getBytes(StandardCharsets.UTF_8);
             
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] newMessageHash = md.digest(messageBytes);
+            byte[] messageHash = md.digest(messageBytes);
             
-            rsaSignature.update(newMessageHash);
+            rsaSignature.update(messageHash);
             
         	//Signature validation
             if(!rsaSignature.verify(encryptedMessageHash)) {
@@ -92,12 +93,12 @@ public class PaymentServiceImpl implements PaymentService {
 	 * @param signatureCertificate
 	 * @return
 	 */
-	private X509Certificate getX509Certificate(String signatureCertificate) {
+	private X509Certificate getX509Certificate(String signatureCertificate)  throws Exception {
 		
 		StringBuilder formatCertificateBuffer = new StringBuilder();
-		formatCertificateBuffer.append("-----BEGIN CERTIFICATE-----\r\n");
+		formatCertificateBuffer.append(Constants.BEGIN_CERTIFICATE);
 		formatCertificateBuffer.append(signatureCertificate);
-		formatCertificateBuffer.append("\r\n-----END CERTIFICATE-----");
+		formatCertificateBuffer.append(Constants.END_CERTIFICATE);
 		
 		InputStream result = new ByteArrayInputStream(formatCertificateBuffer.toString().getBytes(StandardCharsets.UTF_8));
 		CertificateFactory certificateFactory;

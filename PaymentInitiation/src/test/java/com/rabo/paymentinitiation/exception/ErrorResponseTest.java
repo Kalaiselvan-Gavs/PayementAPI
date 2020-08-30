@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.rabo.paymentinitiation.util.PaymentUtil;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -53,5 +55,27 @@ public class ErrorResponseTest {
 		errorResponse = new ErrorResponse("Error");	
 		errorResponse.setMessage("ErrorItem");
 		assertEquals("ErrorItem", errorResponse.getMessage());
+	}
+	
+	@Test
+	public void whenSetErrorCheck() {
+		errorResponse = new ErrorResponse("Error");	
+		errorResponse.setError("Error");
+		assertEquals("Error", errorResponse.getError());
+	}
+	
+	@Test
+	public void whenSetStatusCheck() {
+		errorResponse = new ErrorResponse("Error");	
+		errorResponse.setStatus(400);
+		assertEquals(400, errorResponse.getStatus());
+	}
+	
+	@Test
+	public void whenSetTimestampCheck() {
+		errorResponse = new ErrorResponse("Error");
+		String timeStamp = PaymentUtil.getCurrentTimeStamp().toString();
+		errorResponse.setTimeStamp(timeStamp);
+		assertEquals(timeStamp, errorResponse.getTimeStamp());
 	}
 }

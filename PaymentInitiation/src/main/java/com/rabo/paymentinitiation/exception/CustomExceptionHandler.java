@@ -7,6 +7,7 @@ import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentRejectedResponse;
 import com.rabo.paymentinitiation.model.TransactionStatus;
 import com.rabo.paymentinitiation.util.Constants;
+import com.rabo.paymentinitiation.util.PaymentUtil;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -30,7 +31,8 @@ public class CustomExceptionHandler
     	List<String> details = new ArrayList<>();
         details.add(exception.getLocalizedMessage());
         
-        ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_REQUEST.name(), details);
+        String timeStamp = PaymentUtil.getCurrentTimeStamp().toString();
+        ErrorResponse error = new ErrorResponse(timeStamp, HttpStatus.BAD_REQUEST.value(), ErrorReasonCode.INVALID_REQUEST.getValue(), exception.getLocalizedMessage(), details);
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
     
@@ -40,7 +42,8 @@ public class CustomExceptionHandler
     	List<String> details = exception.getBindingResult().getAllErrors().stream().map(e -> e.getDefaultMessage())
 				.collect(Collectors.toList());
     	
-    	ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_REQUEST.name(), details);
+    	String timeStamp = PaymentUtil.getCurrentTimeStamp().toString();
+        ErrorResponse error = new ErrorResponse(timeStamp, HttpStatus.BAD_REQUEST.value(), ErrorReasonCode.INVALID_REQUEST.getValue(), exception.getLocalizedMessage(), details);
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
 

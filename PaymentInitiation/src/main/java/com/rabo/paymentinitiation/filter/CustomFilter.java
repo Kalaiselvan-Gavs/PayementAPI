@@ -9,17 +9,26 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabo.paymentinitiation.model.ErrorReasonCode;
+import com.rabo.paymentinitiation.model.PaymentRejectedResponse;
+import com.rabo.paymentinitiation.model.TransactionStatus;
 import com.rabo.paymentinitiation.service.PaymentService;
 import com.rabo.paymentinitiation.util.Constants;
 
-@Configuration
-//@Component
-//@Order(Ordered.HIGHEST_PRECEDENCE)
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CustomFilter implements Filter {
 	
 	private static final Logger log = LoggerFactory.getLogger(CustomFilter.class);
@@ -44,20 +53,43 @@ public class CustomFilter implements Filter {
 		String signatureCertificate = wrappedRequest.getHeader(Constants.SIGNATURE_CERTIFICATE);
 		String signature = wrappedRequest.getHeader(Constants.SIGNATURE);
 		
-		byte[] byteArray = StreamUtils.copyToByteArray(wrappedRequest.getInputStream());
-		String requestBody = new String(byteArray);
+		try {
+			byte[] byteArray = StreamUtils.copyToByteArray(wrappedRequest.getInputStream());
+			String requestBody = new String(byteArray);
+			
+			log.info("Logging Request Body : {} ", requestBody);
+			
+			//White listed certificates validation
+			paymentService.whiteListedCertificatesValidation(signatureCertificate);
+			
+			//Signature validation
+			paymentService.verifySignature(xRequestId, requestBody, signatureCertificate, signature);
+			
+			// call next filter in the filter chain
+			filterChain.doFilter(wrappedRequest, response);
+		} catch (Exception exception) {
+			
+			final HttpServletResponseWrapper wrapperResponse = new HttpServletResponseWrapper(response);
+			
+			wrapperResponse.setStatus((ErrorReasonCode.valueOf(exception.getLocalizedMessage()) == ErrorReasonCode.GENERAL_ERROR) 
+					? HttpStatus.INTERNAL_SERVER_ERROR.value() : HttpStatus.UNPROCESSABLE_ENTITY.value());
+			wrapperResponse.setHeader(Constants.X_REQUEST_ID, xRequestId);
+			wrapperResponse.setHeader(Constants.SIGNATURE_CERTIFICATE, signatureCertificate);
+			wrapperResponse.setHeader(Constants.SIGNATURE, signature);
+			wrapperResponse.getWriter().write(convertObjectToJson(exception));
+			wrapperResponse.getWriter().flush();
+		}
+	}
+	
+	public String convertObjectToJson(Exception exception) throws JsonProcessingException {
 		
-		log.info("Logging Request Body : {} ", requestBody);
-		
-		//White listed certificates validation
-		paymentService.whiteListedCertificatesValidation(signatureCertificate);
-		
-		//Signature validation
-		paymentService.verifySignature(xRequestId, requestBody, signatureCertificate, signature);
-		
-		// call next filter in the filter chain
-		filterChain.doFilter(wrappedRequest, response);
-
+		PaymentRejectedResponse paymentRejectedResponse = new PaymentRejectedResponse();
+        paymentRejectedResponse.setReason(ErrorReasonCode.valueOf(exception.getLocalizedMessage()).getValue());
+        paymentRejectedResponse.setStatus(TransactionStatus.REJECTED);
+        paymentRejectedResponse.setReasonCode(ErrorReasonCode.valueOf(exception.getLocalizedMessage()));
+        
+		ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(paymentRejectedResponse);
 	}
 	
 	@Override
@@ -65,4 +97,3 @@ public class CustomFilter implements Filter {
 		log.info("########## Destroying Custom filter ##########");
 	}
 }
-//Ref : https://stackoverflow.com/questions/4449096/how-to-read-request-getinputstream-multiple-times/46824271

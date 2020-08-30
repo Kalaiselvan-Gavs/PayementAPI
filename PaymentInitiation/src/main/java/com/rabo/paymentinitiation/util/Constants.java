@@ -12,4 +12,6 @@ public final class Constants {
 	public static final String X_REQUEST_ID="X-Request-Id";
 	public static final String SIGNATURE_CERTIFICATE ="SIGNATURE-CERTIFICATE";
 	public static final String SIGNATURE="SIGNATURE";
+	public static final String BEGIN_CERTIFICATE="-----BEGIN CERTIFICATE-----\r\n";
+	public static final String END_CERTIFICATE="\r\n-----END CERTIFICATE-----";
 }

@@ -5,6 +5,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.util.ResourceUtils;
@@ -55,4 +56,8 @@ public class PaymentUtil {
     public static void setKeyStorePassword(String keyStorePassword) {
 		PASSWORD = keyStorePassword.toCharArray();
 	}
+    
+    public static Timestamp getCurrentTimeStamp() {
+    	return new Timestamp(System.currentTimeMillis());
+    }
 }

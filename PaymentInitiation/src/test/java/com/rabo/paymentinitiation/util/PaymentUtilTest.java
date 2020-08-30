@@ -35,10 +35,4 @@ public class PaymentUtilTest {
           });
 	}
 	
-	@Test
-	public void shoudHandlePrivateKey() {
-		Assertions.assertThrows(Exception.class, () -> {
-			PaymentUtil.getPrivateKey();
-          });
-	}
 }
