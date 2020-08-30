@@ -68,8 +68,8 @@ public class SecurityConfigTest {
  				.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
  				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
         		.header(Constants.X_REQUEST_ID, "1")
-        		.header(Constants.Signature_Certificate, "2")
-				.header(Constants.Signature, "3");
+        		.header(Constants.SIGNATURE_CERTIFICATE, "2")
+				.header(Constants.SIGNATURE, "3");
      
 	 	MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 	
@@ -87,8 +87,8 @@ public class SecurityConfigTest {
  				.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
  				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
         		.header(Constants.X_REQUEST_ID, "1")
-        		.header(Constants.Signature_Certificate, "2")
-				.header(Constants.Signature, "3");
+        		.header(Constants.SIGNATURE_CERTIFICATE, "2")
+				.header(Constants.SIGNATURE, "3");
      
 	 	MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 	
@@ -104,8 +104,8 @@ public class SecurityConfigTest {
  				.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
  				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
         		.header(Constants.X_REQUEST_ID, "1")
-        		.header(Constants.Signature_Certificate, "2")
-				.header(Constants.Signature, "3");
+        		.header(Constants.SIGNATURE_CERTIFICATE, "2")
+				.header(Constants.SIGNATURE, "3");
      
 	 	MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 	

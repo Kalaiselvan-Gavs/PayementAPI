@@ -7,7 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -33,5 +34,16 @@ public class PaymentAcceptedResponseTest {
         paymentAcceptedResponse.setStatus(TransactionStatus.REJECTED);
         assertEquals("1", paymentAcceptedResponse.getPaymentId());
         assertEquals("REJECTED", paymentAcceptedResponse.getStatus().name());
+    }
+    
+    @Test
+    public void whenPaymentIsRejectedWithError() {
+    	paymentAcceptedResponse = null;
+        assertNull(paymentAcceptedResponse);
+    }
+    
+    @Test
+    public void toStringCheck() {
+    	assertNotNull(paymentAcceptedResponse.toString());
     }
 }

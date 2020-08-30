@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.rabo.paymentinitiation.exception.InvalidException;
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentAcceptedResponse;
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
@@ -33,7 +33,6 @@ public class PaymentInitiationController {
 	@Autowired
 	private PaymentService paymentService;
 	
-	
 	/**
 	 * To Initiate a payment for third party payment providers (TPPs)  
 	 * @param paymentInitiationRequest
@@ -46,17 +45,16 @@ public class PaymentInitiationController {
 			@ApiResponse(code = 422, message = Constants.PAYMENT_REJECTED),
 			@ApiResponse(code = 500, message = Constants.INTERNAL_SERVER), })
 	public ResponseEntity<Object> processPayment(@RequestHeader(name = Constants.X_REQUEST_ID, required = true) String requestId,
-			@RequestHeader(name = Constants.Signature_Certificate, required = true) String signatureCertificate,
-			@RequestHeader(name = Constants.Signature, required = true) String signature,
+			@RequestHeader(name = Constants.SIGNATURE_CERTIFICATE, required = true) String signatureCertificate,
+			@RequestHeader(name = Constants.SIGNATURE, required = true) String signature,
 			@Valid @RequestBody PaymentInitiationRequest paymentInitiationRequest) {
 		
 		log.info("Enter PaymentInitiationController :: processPayment");
 		
-		//Amount limit exceeded
+		//Amount limit exceeded validation
 		if(paymentService.checkForAmoutLimitExceeded(paymentInitiationRequest)) {
-			throw new RuntimeException(ErrorReasonCode.LIMIT_EXCEEDED.name());
+			throw new InvalidException(ErrorReasonCode.LIMIT_EXCEEDED.name());
 		}
-		
 		
 		PaymentAcceptedResponse paymentAcceptedResponse = new PaymentAcceptedResponse();
 		paymentAcceptedResponse.setPaymentId(UUID.randomUUID().toString());
@@ -64,8 +62,8 @@ public class PaymentInitiationController {
 		
 		HttpHeaders headers = new HttpHeaders();
         headers.add(Constants.X_REQUEST_ID, requestId);
-        headers.add(Constants.Signature_Certificate, signatureCertificate);
-        headers.add(Constants.Signature, signature);
+        headers.add(Constants.SIGNATURE_CERTIFICATE, signatureCertificate);
+        headers.add(Constants.SIGNATURE, signature);
         
 		return new ResponseEntity<>(paymentAcceptedResponse, headers, HttpStatus.CREATED);
 	}

@@ -5,6 +5,7 @@ import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
 public interface PaymentService {
 
 	public boolean checkForAmoutLimitExceeded(PaymentInitiationRequest paymentInitiationRequest);
-	public boolean verifySignature(String xRequestId, String requestBody) throws Exception;
+	public void verifySignature(String xRequestId, String requestBody, String signatureCertificate, String signature);
+	public void whiteListedCertificatesValidation(String signatureCertificate);
 	
 }

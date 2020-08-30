@@ -3,63 +3,76 @@ package com.rabo.paymentinitiation.exception;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.ConstraintViolationException;
-
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentRejectedResponse;
 import com.rabo.paymentinitiation.model.TransactionStatus;
 import com.rabo.paymentinitiation.util.Constants;
+
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-@ControllerAdvice
+//@ControllerAdvice
+@RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CustomExceptionHandler
 {   
     @ExceptionHandler(ServletRequestBindingException.class)
     public final ResponseEntity<Object> handleHeaderException(Exception exception, WebRequest request)
     {
-        List<String> details = new ArrayList<>();
+    	List<String> details = new ArrayList<>();
         details.add(exception.getLocalizedMessage());
+        
         ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_REQUEST.name(), details);
-
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
     
-    @ExceptionHandler(ConstraintViolationException.class)
-    public final ResponseEntity<ErrorResponse> handleConstraintViolation(
-                                            ConstraintViolationException exception,
-                                            WebRequest request) {
-        List<String> details = exception.getConstraintViolations()
-                                    .parallelStream()
-                                    .map(e -> e.getMessage())
-                                    .collect(Collectors.toList());
- 
-        ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_REQUEST.name(), details);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public final ResponseEntity<ErrorResponse> handleConstraintViolation(MethodArgumentNotValidException exception, WebRequest request) {
+        
+    	List<String> details = exception.getBindingResult().getAllErrors().stream().map(e -> e.getDefaultMessage())
+				.collect(Collectors.toList());
+    	
+    	ErrorResponse error = new ErrorResponse(ErrorReasonCode.INVALID_REQUEST.name(), details);
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({RuntimeException.class, UsernameNotFoundException.class})
-    public final ResponseEntity<Object> handleException(Exception exception, WebRequest request)
+    @ExceptionHandler(InvalidException.class)
+    public final ResponseEntity<Object> handleInvalidException(InvalidException exception, WebRequest request)
     {
-        PaymentRejectedResponse paymentRejectedResponse = new PaymentRejectedResponse();
-        paymentRejectedResponse.setReason(exception.getLocalizedMessage());
+    	PaymentRejectedResponse paymentRejectedResponse = new PaymentRejectedResponse();
+        paymentRejectedResponse.setReason(ErrorReasonCode.valueOf(exception.getLocalizedMessage()).getValue());
         paymentRejectedResponse.setStatus(TransactionStatus.REJECTED);
-        paymentRejectedResponse.setReasonCode(ErrorReasonCode.valueOf(exception.getMessage()));
+        paymentRejectedResponse.setReasonCode(ErrorReasonCode.valueOf(exception.getLocalizedMessage()));
 
+        return new ResponseEntity<>(paymentRejectedResponse, getRequiredResponseHeaders(request), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    
+    @ExceptionHandler(GeneralException.class)
+    public final ResponseEntity<Object> handleGeneralException(GeneralException exception, WebRequest request)
+    {
+    	PaymentRejectedResponse paymentRejectedResponse = new PaymentRejectedResponse();
+        paymentRejectedResponse.setReason(ErrorReasonCode.valueOf(exception.getLocalizedMessage()).getValue());
+        paymentRejectedResponse.setStatus(TransactionStatus.REJECTED);
+        paymentRejectedResponse.setReasonCode(ErrorReasonCode.valueOf(exception.getLocalizedMessage()));
+    	
         return new ResponseEntity<>(paymentRejectedResponse, getRequiredResponseHeaders(request), HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    private HttpHeaders getRequiredResponseHeaders(WebRequest request){
+    
+    
+    private HttpHeaders getRequiredResponseHeaders(WebRequest request) 
+    {
         HttpHeaders headers = new HttpHeaders();
         headers.add(Constants.X_REQUEST_ID, request.getHeader(Constants.X_REQUEST_ID));
-        headers.add(Constants.Signature_Certificate, request.getHeader(Constants.Signature_Certificate));
-        headers.add(Constants.Signature, request.getHeader(Constants.Signature));
+        headers.add(Constants.SIGNATURE_CERTIFICATE, request.getHeader(Constants.SIGNATURE_CERTIFICATE));
+        headers.add(Constants.SIGNATURE, request.getHeader(Constants.SIGNATURE));
         return headers;
     }
 }

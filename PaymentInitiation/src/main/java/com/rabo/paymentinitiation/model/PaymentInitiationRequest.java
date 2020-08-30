@@ -6,11 +6,11 @@ import javax.validation.constraints.Pattern;
 public class PaymentInitiationRequest {
 
 	@NotEmpty(message = "Debtor IBAN is required")
-	@Pattern(regexp = "[A-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}", message = "The Debtor IBAN must be a valid number")
+	@Pattern(regexp = "[A-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}", message = "Debtor IBAN must be a valid number")
 	private String debtorIBAN;
 
 	@NotEmpty(message = "Creditor IBAN is required")
-	@Pattern(regexp = "[A-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}", message = "The Creditor IBAN must be a valid number")
+	@Pattern(regexp = "[A-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}", message = "Creditor IBAN must be a valid number")
 	private String creditorIBAN;
 
 	@NotEmpty(message = "Amount is required")

@@ -28,4 +28,9 @@ public class ErrorReasonCodeTest {
 		assertNotEquals("UNKNOWN__CERTIFICATE", ErrorReasonCode.UNKNOWN_CERTIFICATE.name());
 
 	}
+	
+	@Test
+	public void testEnumValue() {
+		assertNotEquals("GENERAL ERROR", ErrorReasonCode.GENERAL_ERROR.getValue());
+	}
 }

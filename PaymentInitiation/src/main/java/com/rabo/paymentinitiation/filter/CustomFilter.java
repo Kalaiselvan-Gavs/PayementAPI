@@ -14,11 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StreamUtils;
-import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.service.PaymentService;
 import com.rabo.paymentinitiation.util.Constants;
 
 @Configuration
+//@Component
+//@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CustomFilter implements Filter {
 	
 	private static final Logger log = LoggerFactory.getLogger(CustomFilter.class);
@@ -40,20 +41,19 @@ public class CustomFilter implements Filter {
 		
 		//Reading request body, headers
 		String xRequestId = wrappedRequest.getHeader(Constants.X_REQUEST_ID);
+		String signatureCertificate = wrappedRequest.getHeader(Constants.SIGNATURE_CERTIFICATE);
+		String signature = wrappedRequest.getHeader(Constants.SIGNATURE);
 		
 		byte[] byteArray = StreamUtils.copyToByteArray(wrappedRequest.getInputStream());
 		String requestBody = new String(byteArray);
 		
-		try {
-			//Signature validation
-			if(!paymentService.verifySignature(xRequestId, requestBody)) {
-				throw new RuntimeException(ErrorReasonCode.INVALID_SIGNATURE.name());
-			}
-		} catch (Exception e) {
-			log.error("Exception in Signature verification : ", e);
-		}
-		
 		log.info("Logging Request Body : {} ", requestBody);
+		
+		//White listed certificates validation
+		paymentService.whiteListedCertificatesValidation(signatureCertificate);
+		
+		//Signature validation
+		paymentService.verifySignature(xRequestId, requestBody, signatureCertificate, signature);
 		
 		// call next filter in the filter chain
 		filterChain.doFilter(wrappedRequest, response);

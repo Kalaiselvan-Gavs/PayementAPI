@@ -1,6 +1,7 @@
 package com.rabo.paymentinitiation.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,5 +40,10 @@ public class PaymentInitiationRequestTest {
     public void whenPaymentWithoutEndToEndId() {
     	paymentInitiationRequest.setEndToEndId("");
         assertEquals("", paymentInitiationRequest.getEndToEndId());
+    }
+    
+    @Test
+    public void toStringCheck() {
+    	assertNotNull(paymentInitiationRequest.toString());
     }
 }

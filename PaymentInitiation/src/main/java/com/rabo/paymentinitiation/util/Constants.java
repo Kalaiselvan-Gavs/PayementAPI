@@ -10,6 +10,6 @@ public final class Constants {
 	public static final String PAYMENT_REJECTED="Payment rejected";
 	public static final String SUCCESS_MSG="Payment processed successfully";
 	public static final String X_REQUEST_ID="X-Request-Id";
-	public static final String Signature_Certificate ="Signature-Certificate";
-	public static final String Signature="Signature";
+	public static final String SIGNATURE_CERTIFICATE ="SIGNATURE-CERTIFICATE";
+	public static final String SIGNATURE="SIGNATURE";
 }

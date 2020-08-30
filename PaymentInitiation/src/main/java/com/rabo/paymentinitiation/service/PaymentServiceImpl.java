@@ -1,20 +1,27 @@
 package com.rabo.paymentinitiation.service;
 
+import com.rabo.paymentinitiation.exception.GeneralException;
+import com.rabo.paymentinitiation.exception.InvalidException;
+import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
 import com.rabo.paymentinitiation.util.PaymentUtil;
-
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import javax.crypto.Cipher;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.util.Arrays;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-	@Value( "${key.store.password}" )
-	private String keyStorePassword;
-	
+	private final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
+		
 	/**
 	 * Amount limit exceeded check
 	 * @param paymentInitiationRequest
@@ -28,31 +35,82 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * White listed certificates validation
+	 * @param signatureCertificate
+	 */
+	public void whiteListedCertificatesValidation(String signatureCertificate) {
+		//Get the Certificate
+		X509Certificate certificate = getX509Certificate(signatureCertificate);
+		
+		Principal subjectDN = certificate.getSubjectDN(); 
+		if(null != subjectDN && !subjectDN.getName().contains("Sandbox-TPP")) {
+			throw new InvalidException(ErrorReasonCode.UNKNOWN_CERTIFICATE.name());
+		}
+		log.info("####### Known Certificate ######");
+	}
+	
 	/**
 	 * Verify the signature
 	 */
-	public boolean verifySignature(String xRequestId, String requestBody) throws Exception {
+	public void verifySignature(String xRequestId, String requestBody, String signatureCertificate, String signature) {
 		
-		PaymentUtil.setKeyStorePassword(keyStorePassword);
-		PublicKey publicKey = PaymentUtil.getPublicKey();
-		PrivateKey privateKey = PaymentUtil.getPrivateKey();
+		//Get the Certificate
+		X509Certificate certificate = getX509Certificate(signatureCertificate);
+		RSAPublicKey  publicKey = (RSAPublicKey) certificate.getPublicKey();
+		
+        try {
+        	
+        	//Read signature Attribute
+            byte[] encryptedMessageHash = signature.getBytes(StandardCharsets.UTF_8);//Files.readAllBytes(Paths.get("target/digital_signature_2"));
 
-		byte[] messageBytes = (xRequestId + requestBody).getBytes();
+            Signature rsaSignature = Signature.getInstance("SHA256withRSA");//SIGNING_ALGORITHM
+            rsaSignature.initVerify(publicKey);
 
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		byte[] newMessageHash = md.digest(messageBytes);
-
-		//Encryption
-		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-		byte[] digitalSignatureEncryption = cipher.doFinal(newMessageHash);
-
-		//Decryption
-		cipher.init(Cipher.DECRYPT_MODE, publicKey);
-		byte[] decryptedMessageHash = cipher.doFinal(digitalSignatureEncryption);
-
-		return Arrays.equals(decryptedMessageHash, newMessageHash);
+            //Read RequestBody
+            byte[] messageBytes = (xRequestId + requestBody).getBytes(StandardCharsets.UTF_8);//Files.readAllBytes(Paths.get("src/test/resources/digitalsignature/message.txt"));
+            
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] newMessageHash = md.digest(messageBytes);
+            
+            rsaSignature.update(newMessageHash);
+            
+        	//Signature validation
+            if(!rsaSignature.verify(encryptedMessageHash)) {
+            	throw new InvalidException(ErrorReasonCode.INVALID_SIGNATURE.name());
+            }
+            
+        } catch(Exception ex) {
+        	throw new GeneralException(ErrorReasonCode.GENERAL_ERROR.name());
+        }
+        
+	}
+	
+	/**
+	 * Get certificate
+	 * @param signatureCertificate
+	 * @return
+	 */
+	private X509Certificate getX509Certificate(String signatureCertificate) {
+		
+		StringBuilder formatCertificateBuffer = new StringBuilder();
+		formatCertificateBuffer.append("-----BEGIN CERTIFICATE-----\r\n");
+		formatCertificateBuffer.append(signatureCertificate);
+		formatCertificateBuffer.append("\r\n-----END CERTIFICATE-----");
+		
+		InputStream result = new ByteArrayInputStream(formatCertificateBuffer.toString().getBytes(StandardCharsets.UTF_8));
+		CertificateFactory certificateFactory;
+		X509Certificate certificate;
+		
+		try {
+			certificateFactory = CertificateFactory.getInstance("X.509");
+			certificate = (X509Certificate) certificateFactory.generateCertificate(result);
+		} catch (CertificateException e) {
+			throw new GeneralException(ErrorReasonCode.GENERAL_ERROR.name());
+		}
+		
+		return certificate;
 	}
 	
 }

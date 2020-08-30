@@ -1,15 +1,17 @@
 package com.rabo.paymentinitiation.service;
 
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @RunWith(SpringRunner.class)
@@ -47,12 +49,10 @@ class PaymentServiceImplTest {
         assertThat(!isAmountLimitExceeded);
     }
 
-    @Test
+    @org.junit.Test(expected = NullPointerException.class)
     void whenPaymentAmountRequestIsNull() {
         paymentRequest = null;
-        Assertions.assertThrows(NullPointerException.class, () -> {
-        	paymentService.checkForAmoutLimitExceeded(paymentRequest);
-          });
+        paymentService.checkForAmoutLimitExceeded(paymentRequest);
     }
 
     @Test
@@ -62,25 +62,32 @@ class PaymentServiceImplTest {
         assertThat(!isAmountLimitExceeded);
     }
     
-    @Test
+    /*@Test
     void whenVerifySignature_OK() throws Exception {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-        	paymentService.verifySignature("", null);
-          });
-    }
+    	paymentService.verifySignature(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class));
+    }*/
 
     @Test
-    void whenVerifySignature_NotOk() throws Exception {
-        paymentRequest = null;
-        Assertions.assertThrows(NullPointerException.class, () -> {
-        	paymentService.verifySignature(null, new String());
-          });
-    }
+    void whenVerifySignature() throws Exception {
+        
+        try {
 
+        	paymentService.verifySignature(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class));
+
+        } catch (RuntimeException e) {
+        	assertThat(e.getCause());
+        }
+    }
+    
     @Test
-    void whenVerifySignature_requestIsNull() throws Exception {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-        	paymentService.verifySignature("", null);
-          });
+    void whenwhiteListedCertificatesValidation() throws Exception {
+        
+        try {
+
+        	paymentService.whiteListedCertificatesValidation(Mockito.any(String.class));
+
+        } catch (RuntimeException e) {
+        	assertThat(e.getCause());
+        }
     }
 }
