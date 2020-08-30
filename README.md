@@ -27,13 +27,13 @@ Click on execute.
 
 # Validation Handling
 
-White listed certificates validation => SecurityConfig.java
+White listed certificates validation => CustomFilter.java
 
 Verify Singationature => CustomFilter.java
 
 Request validation , GENERAL_ERROR => CustomExceptionHandler.java
 
-Bean Level validations
+Bean Level validations also present.
 
 ======================================================================
 
