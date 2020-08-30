@@ -63,7 +63,6 @@ public class CustomExceptionHandlerTest {
         paymentRequest.setCreditorIBAN("NL94ABNA1008270121");
         paymentRequest.setAmount("1.0");
         paymentRequest.setEndToEndId("1");
-        headers = new HttpHeaders();
     }
 
     @Test
@@ -86,20 +85,10 @@ public class CustomExceptionHandlerTest {
 				.header(Constants.X_REQUEST_ID, "1")
 				.header(Constants.SIGNATURE_CERTIFICATE, "2")
 				.header(Constants.SIGNATURE, "3"))
-        		.andExpect(status().isOk());
+        		.andExpect(status().is4xxClientError());
  
     }
     
-    @Test
-    public void whenHandlewithHeaderMissing() throws Exception {
-
-        this.mockMvc.perform(post("/payment/v1.0.0/initiate-payment")
-        		.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
-        		.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-				.header(Constants.X_REQUEST_ID, "1")
-				.header(Constants.SIGNATURE, "3"))
-        		.andExpect(status().is4xxClientError());
-    }
     
     @Test
     public void whenHandlewithBeanValidation() throws Exception {

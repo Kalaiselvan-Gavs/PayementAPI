@@ -31,6 +31,6 @@ public class ErrorReasonCodeTest {
 	
 	@Test
 	public void testEnumValue() {
-		assertNotEquals("GENERAL ERROR", ErrorReasonCode.GENERAL_ERROR.getValue());
+		assertEquals("GENERAL ERROR", ErrorReasonCode.GENERAL_ERROR.getValue());
 	}
 }
