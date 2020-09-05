@@ -121,8 +121,9 @@ public class CustomExceptionHandlerTest {
     	this.mockMvc.perform(post("/payment/v1.0.0/initiate-payment")
         		.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
         		.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+        		.header(Constants.X_REQUEST_ID, "1")
 				.header(Constants.SIGNATURE_CERTIFICATE, "2")
 				.header(Constants.SIGNATURE, "3"))
-    			.andExpect(status().is4xxClientError());
+    			.andExpect(status().is2xxSuccessful());
     }
 }

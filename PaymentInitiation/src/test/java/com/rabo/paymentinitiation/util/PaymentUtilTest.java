@@ -1,9 +1,14 @@
 package com.rabo.paymentinitiation.util;
 
+import static org.hamcrest.CoreMatchers.any;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.sql.Timestamp;
 
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 
 public class PaymentUtilTest {
 	@Test
@@ -29,10 +34,23 @@ public class PaymentUtilTest {
 	}
 	
 	@Test
-	public void shoudHandlePublicKeyIOException() {
-		Assertions.assertThrows(Exception.class, () -> {
-			PaymentUtil.getPublicKey();
+	public void shoudHandleFormatCertificateString() {
+		String signatureCertificate = Constants.BEGIN_CERTIFICATE +"da+Qmv1MZeHaMFAZvz0OcDnvDwzXOSVOTU1XX" + Constants.END_CERTIFICATE;
+		String formatCertificateString = PaymentUtil.formatSignatureCertificate(signatureCertificate);
+		assertNotNull(formatCertificateString);
+	}
+	
+	@Test
+	public void shouldHandleEmptyFormatCertificateString() {
+		
+		Assertions.assertThrows(RuntimeException.class, () -> {
+			PaymentUtil.formatSignatureCertificate(null);
           });
 	}
 	
+	@Test
+	public void shouldGetCurrentTimeStamp() {
+		Timestamp currentTimestamp = PaymentUtil.getCurrentTimeStamp();
+		assertNotNull(currentTimestamp);
+	}
 }

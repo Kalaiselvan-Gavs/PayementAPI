@@ -17,7 +17,7 @@ public class PaymentInitiationRequest {
 	@Pattern(regexp = "-?[0-9]+(\\.[0-9]{1,3})?", message = "The amount must be a valid number")
 	private String amount;
 
-	@NotEmpty(message = "End to End id is required")
+	//@NotEmpty(message = "End to End id is required")
 	private String endToEndId;
 
 	public String getCreditorIBAN() {

@@ -1,5 +1,6 @@
 package com.rabo.paymentinitiation.service;
 
+import com.google.common.primitives.Bytes;
 import com.rabo.paymentinitiation.exception.GeneralException;
 import com.rabo.paymentinitiation.exception.InvalidException;
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
@@ -17,6 +18,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -47,45 +49,54 @@ public class PaymentServiceImpl implements PaymentService {
 		
 		Principal subjectDN = certificate.getSubjectDN(); 
 		if(null != subjectDN && !subjectDN.getName().contains("Sandbox-TPP")) {
+			log.info("####### UnKnown Certificate ######");
 			throw new InvalidException(ErrorReasonCode.UNKNOWN_CERTIFICATE.name());
 		}
-		log.info("####### Known Certificate ######");
 	}
 	
 	/**
 	 * Verify the signature
 	 */
 	public void verifySignature(String xRequestId, String requestBody, String signatureCertificate, String signature)  throws Exception {
-		
-		//Get the Certificate
-		X509Certificate certificate = getX509Certificate(signatureCertificate);
-		RSAPublicKey  publicKey = (RSAPublicKey) certificate.getPublicKey();
-		
-        try {
-        	
-        	//Read signature Attribute
-            byte[] encryptedMessageHash = signature.getBytes(StandardCharsets.UTF_8);
 
-            Signature rsaSignature = Signature.getInstance("SHA256withRSA");
-            rsaSignature.initVerify(publicKey);
+		boolean isValidSignature = false;
 
-            //Read RequestBody
-            byte[] messageBytes = (xRequestId + requestBody).getBytes(StandardCharsets.UTF_8);
-            
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] messageHash = md.digest(messageBytes);
-            
-            rsaSignature.update(messageHash);
-            
-        	//Signature validation
-            if(!rsaSignature.verify(encryptedMessageHash)) {
-            	throw new InvalidException(ErrorReasonCode.INVALID_SIGNATURE.name());
-            }
-            
-        } catch(Exception ex) {
-        	throw new GeneralException(ErrorReasonCode.GENERAL_ERROR.name());
-        }
-        
+		try {
+			// Get the Certificate
+			X509Certificate certificate = getX509Certificate(signatureCertificate);
+			RSAPublicKey publicKey = (RSAPublicKey) certificate.getPublicKey();
+			
+			// Read signature header
+			byte[] encryptedSignatureBytes = signature.getBytes(StandardCharsets.UTF_8);
+			byte[] decryptedSignatureHash = Base64.getDecoder().decode(encryptedSignatureBytes);
+
+			// Read RequestBody
+			byte[] requestBodyBytes = requestBody.getBytes(StandardCharsets.UTF_8);
+
+			byte[] requestIdBytes = xRequestId.getBytes(StandardCharsets.UTF_8);
+
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] requestBodyHash = md.digest(requestBodyBytes);
+
+			// Compute Hash
+			byte[] computeSignatureHash = Bytes.concat(requestIdBytes, requestBodyHash);
+
+			// Create Signature
+			Signature rsaSignature = Signature.getInstance("SHA256withRSA");
+			rsaSignature.initVerify(publicKey);
+
+			rsaSignature.update(computeSignatureHash);
+
+			// Signature validation
+			isValidSignature = rsaSignature.verify(decryptedSignatureHash);
+
+		} catch (Exception ex) {
+			throw new GeneralException(ErrorReasonCode.GENERAL_ERROR.name());
+		}
+		
+		if(!isValidSignature) {
+			throw new InvalidException(ErrorReasonCode.INVALID_SIGNATURE.name());
+		}
 	}
 	
 	/**
@@ -95,12 +106,8 @@ public class PaymentServiceImpl implements PaymentService {
 	 */
 	private X509Certificate getX509Certificate(String signatureCertificate)  throws Exception {
 		
-		StringBuilder formatCertificateBuffer = new StringBuilder();
-		formatCertificateBuffer.append(Constants.BEGIN_CERTIFICATE);
-		formatCertificateBuffer.append(signatureCertificate);
-		formatCertificateBuffer.append(Constants.END_CERTIFICATE);
-		
-		InputStream result = new ByteArrayInputStream(formatCertificateBuffer.toString().getBytes(StandardCharsets.UTF_8));
+		String formatCertificate = PaymentUtil.formatSignatureCertificate(signatureCertificate);
+		InputStream result = new ByteArrayInputStream(formatCertificate.getBytes(StandardCharsets.UTF_8));
 		CertificateFactory certificateFactory;
 		X509Certificate certificate;
 		

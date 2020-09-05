@@ -1,26 +1,10 @@
 package com.rabo.paymentinitiation.util;
 
-import java.io.FileInputStream;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.util.ResourceUtils;
 
 public class PaymentUtil {
-
-	
-
-    private static final String STORE_TYPE = "PKCS12";
-    private static char[] PASSWORD;
-    private static final String SENDER_KEYSTORE = "classpath:ssl/sender_keystore.p12";
-    private static final String SENDER_ALIAS = "senderKeyPair";
-
-    private static final String RECEIVER_KEYSTORE = "classpath:ssl/receiver_keystore.p12";
-    private static final String RECEIVER_ALIAS = "receiverKeyPair";
 
     private PaymentUtil() {
 		
@@ -40,24 +24,28 @@ public class PaymentUtil {
         return sum;
     }
 
-    public static PrivateKey getPrivateKey() throws Exception {
-        KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
-        keyStore.load(new FileInputStream(ResourceUtils.getFile(SENDER_KEYSTORE)), PASSWORD);
-        return (PrivateKey) keyStore.getKey(SENDER_ALIAS, PASSWORD);
-    }
-
-    public static PublicKey getPublicKey() throws Exception {
-    	KeyStore keyStore = KeyStore.getInstance(STORE_TYPE);
-        keyStore.load(new FileInputStream(ResourceUtils.getFile(RECEIVER_KEYSTORE)), PASSWORD);
-        Certificate certificate = keyStore.getCertificate(RECEIVER_ALIAS);
-        return certificate.getPublicKey();
-    }
-
-    public static void setKeyStorePassword(String keyStorePassword) {
-		PASSWORD = keyStorePassword.toCharArray();
-	}
-    
+    /**
+     * Get Current Timestamp
+     * @return
+     */
     public static Timestamp getCurrentTimeStamp() {
     	return new Timestamp(System.currentTimeMillis());
+    }
+    
+    /**
+     * Format certificate string to create X509 certificate
+     * @param signatureCertificate
+     * @return
+     */
+    public static String formatSignatureCertificate(String signatureCertificate) {
+    	
+    	StringBuilder certificateBuilder = new StringBuilder();
+		certificateBuilder.append(signatureCertificate);
+		int beginCertificateIndex = certificateBuilder.indexOf(Constants.BEGIN_CERTIFICATE);
+		certificateBuilder.replace(beginCertificateIndex, beginCertificateIndex + Constants.BEGIN_CERTIFICATE.length(), Constants.BEGIN_CERTIFICATE + "\r\n");
+		int endCertificateIndex = certificateBuilder.indexOf(Constants.END_CERTIFICATE);
+		certificateBuilder.replace(endCertificateIndex, endCertificateIndex + Constants.END_CERTIFICATE.length(), "\r\n" + Constants.END_CERTIFICATE);
+		return certificateBuilder.toString();
+		
     }
 }
