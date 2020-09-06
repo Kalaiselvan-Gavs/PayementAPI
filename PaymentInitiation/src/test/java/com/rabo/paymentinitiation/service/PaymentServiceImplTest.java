@@ -1,8 +1,12 @@
 package com.rabo.paymentinitiation.service;
 
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
+import com.rabo.paymentinitiation.util.Constants;
+import com.rabo.paymentinitiation.util.PaymentUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +26,12 @@ class PaymentServiceImplTest {
     private PaymentService paymentService = new PaymentServiceImpl();;
 
     private PaymentInitiationRequest paymentRequest;
+    
+    String signatureCertificate;
 
     @BeforeEach
     void setUp() {
+    	signatureCertificate = Constants.BEGIN_CERTIFICATE +"\r\nda+Qmv1MZeHaMFAZvz0OcDnvDwzXOSVOTU1XX\r\n" + Constants.END_CERTIFICATE;
     	paymentRequest = new PaymentInitiationRequest();
         paymentRequest.setDebtorIBAN("NL02RABO7134384551");
         paymentRequest.setCreditorIBAN("NL94ABNA1008270121");
@@ -71,7 +78,7 @@ class PaymentServiceImplTest {
     void whenVerifySignature() throws Exception {
         
         try {
-
+        	given(PaymentUtil.formatSignatureCertificate(Mockito.any())).willReturn(signatureCertificate);
         	paymentService.verifySignature(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class));
 
         } catch (RuntimeException e) {
@@ -83,7 +90,7 @@ class PaymentServiceImplTest {
     void whenwhiteListedCertificatesValidation() throws Exception {
         
         try {
-
+        	given(PaymentUtil.formatSignatureCertificate(signatureCertificate)).willReturn(Mockito.any(String.class));
         	paymentService.whiteListedCertificatesValidation(Mockito.any(String.class));
 
         } catch (RuntimeException e) {

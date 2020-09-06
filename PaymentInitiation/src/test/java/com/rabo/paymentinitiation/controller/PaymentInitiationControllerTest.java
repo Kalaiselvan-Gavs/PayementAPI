@@ -91,7 +91,7 @@ public class PaymentInitiationControllerTest {
     @Test
     public void whenCheckForInvalidDebtorIBAN() throws Exception {
     	paymentRequest.setDebtorIBAN("NL02RAB");
-        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(true);
+        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
 
         mvc.perform(post("/payment/v1.0.0/initiate-payment")
         		.contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +106,7 @@ public class PaymentInitiationControllerTest {
     @Test
     public void whenCheckForEmptyCreditorIBAN() throws Exception {
     	paymentRequest.setCreditorIBAN("");
-        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(true);
+        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
 
         mvc.perform(post("/payment/v1.0.0/initiate-payment")
         		.contentType(MediaType.APPLICATION_JSON)
@@ -121,7 +121,7 @@ public class PaymentInitiationControllerTest {
     @Test
     public void whenCheckForInvalidCreditorIBAN() throws Exception {
     	paymentRequest.setCreditorIBAN("NL94ABN");
-        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(true);
+        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
 
         mvc.perform(post("/payment/v1.0.0/initiate-payment")
         		.contentType(MediaType.APPLICATION_JSON)
@@ -136,7 +136,7 @@ public class PaymentInitiationControllerTest {
     @Test
     public void whenCheckForAmountEmpty() throws Exception {
     	paymentRequest.setAmount("");
-        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(true);
+        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
 
         mvc.perform(post("/payment/v1.0.0/initiate-payment")
         		.contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +151,7 @@ public class PaymentInitiationControllerTest {
     @Test
     public void whenCheckForInvalidAmount() throws Exception {
     	paymentRequest.setAmount("a.00");
-        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(true);
+        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
 
         mvc.perform(post("/payment/v1.0.0/initiate-payment")
         		.contentType(MediaType.APPLICATION_JSON)

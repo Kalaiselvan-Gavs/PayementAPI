@@ -72,7 +72,7 @@ public class CustomFilter implements Filter {
 			final HttpServletResponseWrapper wrapperResponse = new HttpServletResponseWrapper(response);
 			
 			wrapperResponse.setStatus((ErrorReasonCode.valueOf(exception.getLocalizedMessage()) == ErrorReasonCode.GENERAL_ERROR) 
-					? HttpStatus.INTERNAL_SERVER_ERROR.value() : HttpStatus.UNPROCESSABLE_ENTITY.value());
+					? HttpStatus.INTERNAL_SERVER_ERROR.value() : HttpStatus.BAD_REQUEST.value());
 			wrapperResponse.setHeader(Constants.X_REQUEST_ID, xRequestId);
 			wrapperResponse.setHeader(Constants.SIGNATURE_CERTIFICATE, signatureCertificate);
 			wrapperResponse.setHeader(Constants.SIGNATURE, signature);
