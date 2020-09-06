@@ -25,12 +25,11 @@ public class ErrorResponse
         this.details = details;
     }
 	
-	public ErrorResponse(String timeStamp, int status, String error, String message, List<String> details) {
+	public ErrorResponse(String timeStamp, int status, String error, List<String> details) {
         super();
         this.status = status;
         this.timeStamp = timeStamp;
         this.error = error;
-        //this.message = message;
         this.details = details;
     }
 	

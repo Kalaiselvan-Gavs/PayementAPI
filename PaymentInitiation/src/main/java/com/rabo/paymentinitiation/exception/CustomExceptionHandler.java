@@ -32,7 +32,7 @@ public class CustomExceptionHandler
         details.add(exception.getLocalizedMessage());
         
         String timeStamp = PaymentUtil.getCurrentTimeStamp().toString();
-        ErrorResponse error = new ErrorResponse(timeStamp, HttpStatus.BAD_REQUEST.value(), ErrorReasonCode.INVALID_REQUEST.getValue(), exception.getLocalizedMessage(), details);
+        ErrorResponse error = new ErrorResponse(timeStamp, HttpStatus.BAD_REQUEST.value(), ErrorReasonCode.INVALID_REQUEST.getValue(), details);
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
     
@@ -43,7 +43,7 @@ public class CustomExceptionHandler
 				.collect(Collectors.toList());
     	
     	String timeStamp = PaymentUtil.getCurrentTimeStamp().toString();
-        ErrorResponse error = new ErrorResponse(timeStamp, HttpStatus.BAD_REQUEST.value(), ErrorReasonCode.INVALID_REQUEST.getValue(), exception.getLocalizedMessage(), details);
+        ErrorResponse error = new ErrorResponse(timeStamp, HttpStatus.BAD_REQUEST.value(), ErrorReasonCode.INVALID_REQUEST.getValue(), details);
         return new ResponseEntity<>(error, getRequiredResponseHeaders(request), HttpStatus.BAD_REQUEST);
     }
 

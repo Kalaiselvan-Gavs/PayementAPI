@@ -5,7 +5,6 @@ import com.rabo.paymentinitiation.exception.GeneralException;
 import com.rabo.paymentinitiation.exception.InvalidException;
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentInitiationRequest;
-import com.rabo.paymentinitiation.util.Constants;
 import com.rabo.paymentinitiation.util.PaymentUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
 	 * @param signatureCertificate
 	 * @return
 	 */
-	private X509Certificate getX509Certificate(String signatureCertificate)  throws Exception {
+	private X509Certificate getX509Certificate(String signatureCertificate)  throws CertificateException {
 		
 		String formatCertificate = PaymentUtil.formatSignatureCertificate(signatureCertificate);
 		InputStream result = new ByteArrayInputStream(formatCertificate.getBytes(StandardCharsets.UTF_8));

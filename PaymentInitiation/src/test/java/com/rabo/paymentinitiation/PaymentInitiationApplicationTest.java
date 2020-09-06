@@ -29,5 +29,6 @@ class PaymentInitiationApplicationTest {
     @Test
     public void applicationStarts() throws Exception {
     	PaymentInitiationApplication.main(new String[] {});
+    	assertThat(paymentInitiationController).isNotNull();
     }
 }

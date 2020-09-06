@@ -89,38 +89,8 @@ public class PaymentInitiationControllerTest {
     }
     
     @Test
-    public void whenCheckForInvalidDebtorIBAN() throws Exception {
-    	paymentRequest.setDebtorIBAN("NL02RAB");
-        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
-
-        mvc.perform(post("/payment/v1.0.0/initiate-payment")
-        		.contentType(MediaType.APPLICATION_JSON)
-        		.content(objectMappaer.writeValueAsString(paymentRequest))
-        		.header(Constants.X_REQUEST_ID, "1")
-        		.header(Constants.SIGNATURE_CERTIFICATE, "2")
-        		.header(Constants.SIGNATURE, "3"))
-        		.andExpect(status().is4xxClientError());
-        reset(service);
-    }
-    
-    @Test
     public void whenCheckForEmptyCreditorIBAN() throws Exception {
     	paymentRequest.setCreditorIBAN("");
-        given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
-
-        mvc.perform(post("/payment/v1.0.0/initiate-payment")
-        		.contentType(MediaType.APPLICATION_JSON)
-        		.content(objectMappaer.writeValueAsString(paymentRequest))
-        		.header(Constants.X_REQUEST_ID, "1")
-        		.header(Constants.SIGNATURE_CERTIFICATE, "2")
-        		.header(Constants.SIGNATURE, "3"))
-        		.andExpect(status().is4xxClientError());
-        reset(service);
-    }
-    
-    @Test
-    public void whenCheckForInvalidCreditorIBAN() throws Exception {
-    	paymentRequest.setCreditorIBAN("NL94ABN");
         given(service.checkForAmoutLimitExceeded(Mockito.any())).willReturn(false);
 
         mvc.perform(post("/payment/v1.0.0/initiate-payment")

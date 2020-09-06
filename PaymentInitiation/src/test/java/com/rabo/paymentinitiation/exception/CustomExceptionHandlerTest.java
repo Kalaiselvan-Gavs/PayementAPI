@@ -1,20 +1,9 @@
 package com.rabo.paymentinitiation.exception;
 
-import static org.hamcrest.CoreMatchers.any;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.security.Principal;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.validation.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -80,7 +69,6 @@ public class CustomExceptionHandlerTest {
         mockMvc.perform(post("/payment/v1.0.0/initiate-payment")).andExpect(status().is(400));
         this.mockMvc.perform(post("/payment/v1.0.0/initiate-payment")
         		.accept(MediaType.APPLICATION_JSON).content(objectMappaer.writeValueAsString(paymentRequest))
-        		.header("Authorization", "Bearer foo")
         		.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(Constants.X_REQUEST_ID, "1")
 				.header(Constants.SIGNATURE_CERTIFICATE, "2")
