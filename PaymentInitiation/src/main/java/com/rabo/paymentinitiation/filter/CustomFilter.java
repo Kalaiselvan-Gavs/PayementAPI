@@ -18,8 +18,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabo.paymentinitiation.exception.InvalidException;
 import com.rabo.paymentinitiation.model.ErrorReasonCode;
 import com.rabo.paymentinitiation.model.PaymentRejectedResponse;
 import com.rabo.paymentinitiation.model.TransactionStatus;
@@ -53,6 +55,13 @@ public class CustomFilter implements Filter {
 		String signature = wrappedRequest.getHeader(Constants.SIGNATURE);
 		
 		try {
+			
+			if(StringUtils.isEmpty(xRequestId)
+					|| StringUtils.isEmpty(signatureCertificate)
+					|| StringUtils.isEmpty(signature)) {
+				throw new InvalidException(ErrorReasonCode.INVALID_REQUEST.name());
+			}
+			
 			byte[] byteArray = StreamUtils.copyToByteArray(wrappedRequest.getInputStream());
 			String requestBody = new String(byteArray);
 			
