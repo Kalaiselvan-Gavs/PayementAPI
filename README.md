@@ -22,8 +22,11 @@ Hit the http://localhost:8443/swagger-ui.html URL in browser.
 Expand the Payment-Initation-Controller operation and input the valid payment details.
 
 Click on execute.
+
 ============================================================================
-Unit testing result : UnitTestingResults.pdf 
+
+Unit Testing result : https://github.com/Kalaiselvan-Gavs/PayementAPI/blob/master/UnitTestingResults.pdf
+
 ============================================================================
 
 # Validation Handling
